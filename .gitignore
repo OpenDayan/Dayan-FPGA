@@ -1,0 +1,11 @@
+.Xil/
+*.jou
+*.log
+*.dcp
+*.rpt
+
+/src/ip/gen/
+/src/rtl/
+
+/npu-axvu13p/
+

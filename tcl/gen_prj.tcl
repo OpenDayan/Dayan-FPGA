@@ -1,7 +1,7 @@
 #!./vivado_wrapper.sh
 
-set script_dir [file dirname [info script]]
-source ${script_dir}/common.tcl
+set tcl_dir [file dirname [info script]]
+source ${tcl_dir}/common.tcl
 
 set rtl_files   [glob "${root_dir}/src/rtl/*.v" glob "${root_dir}/src/rtl/*.sv"]
 set xdc_files   [list "${root_dir}/src/xdc"]
@@ -21,7 +21,7 @@ update_compile_order -fileset sources_1
 
 # BD
 source ${soc_bd_tcl}
-source ${script_dir}/add_dut.tcl
+source ${tcl_dir}/add_dut.tcl
 
 # wrapper 
 make_wrapper -files [get_files $soc_bd_file] -top

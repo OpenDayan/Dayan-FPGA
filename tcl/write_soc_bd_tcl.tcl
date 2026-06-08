@@ -1,7 +1,7 @@
 #!./vivado_wrapper.sh
 
-set script_dir [file dirname [info script]]
-source ${script_dir}/common.tcl
+set tcl_dir [file dirname [info script]]
+source ${tcl_dir}/common.tcl
 
 safe_open_project ${project_dir}/${project_name}.xpr
 safe_open_bd_design $soc_bd_file

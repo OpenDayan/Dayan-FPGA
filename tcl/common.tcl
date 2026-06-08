@@ -1,7 +1,7 @@
 
-set script_dir [file dirname [info script]]
+set tcl_dir [file dirname [info script]]
 
-set root_dir "${script_dir}/.."
+set root_dir "${tcl_dir}/.."
 
 set project_name "npu-axvu13p"
 set project_dir "${root_dir}/${project_name}"
@@ -12,9 +12,7 @@ set soc_bd_wrapper_file "${project_dir}/npu-axvu13p.srcs/sources_1/bd/soc/hdl/so
 
 set clk_wiz_path "/clk_wiz_0"
 
-set dut_mod_name "RvtsocWrapper"
-set dut_addr_range "16M"
-set dut_addr_offset "0x400000000"
+source $tcl_dir/config.tcl
 
 set top_module "soc_wrapper"
 

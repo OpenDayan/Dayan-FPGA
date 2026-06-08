@@ -1,7 +1,7 @@
 #!./vivado_wrapper.sh
 
-set script_dir [file dirname [info script]]
-source ${script_dir}/common.tcl
+set tcl_dir [file dirname [info script]]
+source ${tcl_dir}/common.tcl
 
 if {$argc != 1} {
     puts "Usage: set_clk.tcl <clk_freq_mhz>"

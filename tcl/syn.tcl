@@ -1,7 +1,7 @@
 #!./vivado_wrapper.sh
 
-set script_dir [file dirname [info script]]
-source ${script_dir}/common.tcl
+set tcl_dir [file dirname [info script]]
+source ${tcl_dir}/common.tcl
 
 set sockets [exec lscpu | grep "Socket(s)" | awk "{print \$2}"]
 set cores_per_socket [exec lscpu | grep "Core(s) per socket" | awk "{print \$4}"]
@@ -16,7 +16,7 @@ set_param general.maxThreads 8
 get_param general.maxThreads
 
 # project
-safe_open_project ${target_dir}/${project_name}.xpr
+safe_open_project ${project_dir}/${project_name}.xpr
 
 reset_run synth_1
 

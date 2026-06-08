@@ -1,7 +1,7 @@
 #!./vivado_wrapper.sh
 
-set script_dir [file dirname [info script]]
-source ${script_dir}/common.tcl
+set tcl_dir [file dirname [info script]]
+source ${tcl_dir}/common.tcl
 
 safe_open_project ${project_dir}/${project_name}.xpr
 safe_open_bd_design $soc_bd_file
@@ -19,8 +19,12 @@ regenerate_bd_layout
 
 assign_bd_address -target_address_space /${dut_mod_name}_0/m_axi [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force
 assign_bd_address -target_address_space /xdma/xdma_0/M_AXI [get_bd_addr_segs ${dut_mod_name}_0/s_axi/reg0] -force
-set_property range ${dut_addr_range} [get_bd_addr_segs xdma/xdma_0/M_AXI/SEG_${dut_mod_name}_0_reg0]
-set_property offset ${dut_addr_offset} [get_bd_addr_segs xdma/xdma_0/M_AXI/SEG_${dut_mod_name}_0_reg0]
+
+
+assign_bd_address -offset ${dut_addr_offset} -range ${dut_addr_range} [get_bd_addr_segs xdma/xdma_0/M_AXI/SEG_${dut_mod_name}_0_reg0]
+
+assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_addr_segs {xdma/xdma_0/M_AXI/SEG_ddr4_0_C0_DDR4_ADDRESS_BLOCK}]
+assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK]
 
 validate_bd_design -force
 save_bd_design [current_bd_design]

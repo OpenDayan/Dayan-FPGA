@@ -4,6 +4,8 @@
 *.dcp
 *.rpt
 
+/tcl/config.tcl
+
 /src/ip/gen/
 /src/rtl/
 

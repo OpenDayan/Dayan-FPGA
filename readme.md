@@ -39,4 +39,5 @@ cd tcl
 ```bash
 cd tcl
 ./syn.tcl
+./impl.tcl
 ```

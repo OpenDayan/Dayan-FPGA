@@ -16,6 +16,15 @@ source $tcl_dir/config.tcl
 
 set top_module "soc_wrapper"
 
+set sockets [exec lscpu | grep "Socket(s)" | awk "{print \$2}"]
+set cores_per_socket [exec lscpu | grep "Core(s) per socket" | awk "{print \$4}"]
+set jobs [expr {$sockets * $cores_per_socket}]
+if {$jobs <= 0} {
+    set jobs 4
+}
+
+set_param general.maxThreads 8
+
 if {![info exists safe_project_opened_by_script]} {
     set safe_project_opened_by_script 0
 }

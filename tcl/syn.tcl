@@ -3,17 +3,8 @@
 set tcl_dir [file dirname [info script]]
 source ${tcl_dir}/common.tcl
 
-set sockets [exec lscpu | grep "Socket(s)" | awk "{print \$2}"]
-set cores_per_socket [exec lscpu | grep "Core(s) per socket" | awk "{print \$4}"]
-set jobs [expr {$sockets * $cores_per_socket}]
-if {$jobs <= 0} {
-    set jobs 4
-}
 puts "Using $jobs parallel jobs for synthesis and implementation."
-
-get_param general.maxThreads
-set_param general.maxThreads 8
-get_param general.maxThreads
+puts "Max threads: [get_param general.maxThreads]"
 
 # project
 safe_open_project ${project_dir}/${project_name}.xpr
@@ -39,25 +30,6 @@ while {1} {
 }
 
 wait_on_run synth_1
-
-launch_runs impl_1 -jobs $jobs
-wait_on_run impl_1
-
-launch_runs impl_1 -to_step write_bitstream -jobs $jobs
-wait_on_run impl_1
-
-
-# Generate reports
-open_run impl_1
-report_timing_summary -file timing_summary.rpt
-report_utilization -file utilization.rpt
-
-# Generate reports
-#report_timing_summary -file timing_summary.rpt
-#report_utilization -file utilization.rpt
-
-# Save synthesized design checkpoint
-#write_checkpoint -force top_synth.dcp
 
 # Close project
 safe_close_project

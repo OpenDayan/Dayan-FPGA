@@ -1,5 +1,5 @@
 set dut_mod_name "RvtsocWrapper"
 set dut_addr_range "16M"
-set dut_addr_offset "0x400000000"
+set dut_addr_offset "0x4000000000"
 set ddr_addr_range "16G"
-set ddr_addr_offset "0x000000000"
+set ddr_addr_offset "0x0000000000"

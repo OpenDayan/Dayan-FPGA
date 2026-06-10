@@ -6,6 +6,8 @@ set root_dir "${tcl_dir}/.."
 set project_name "npu-axvu13p"
 set project_dir "${root_dir}/${project_name}"
 
+set rpt_dir "${root_dir}/rpt"
+
 set soc_bd_tcl "${root_dir}/src/bd/soc_bd.tcl"
 set soc_bd_file "${project_dir}/npu-axvu13p.srcs/sources_1/bd/soc/soc.bd"
 set soc_bd_wrapper_file "${project_dir}/npu-axvu13p.srcs/sources_1/bd/soc/hdl/soc_wrapper.v"

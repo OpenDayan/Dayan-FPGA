@@ -27,12 +27,12 @@ if { $needs_refresh || ![string match "*Complete*" $status] } {
 
     # Generate reports
     open_run impl_1
-    report_timing_summary -file timing_summary.rpt
-    report_utilization -file utilization.rpt
 
-    # Generate reports
-    #report_timing_summary -file timing_summary.rpt
-    #report_utilization -file utilization.rpt
+    if {![file exists $rpt_dir]} {
+        file mkdir $rpt_dir
+    }
+    report_timing_summary -file $rpt_dir/timing_summary.rpt
+    report_utilization -file $rpt_dir/utilization.rpt
 
     # Save synthesized design checkpoint
     #write_checkpoint -force top_synth.dcp   

@@ -10,6 +10,9 @@ TCL_DIR=$(BASE_DIR)/tcl
 PROJECT_DIR=$(BASE_DIR)/npu-axvu13p
 SYN_DIR=$(PROJECT_DIR)/npu-axvu13p.runs/synth_1
 
+OUT_SYN_DIR=$(BASE_DIR)/out/syn
+OUT_IMPL_DIR=$(BASE_DIR)/out/impl
+
 .PHONY: default gen-prj syn config
 
 default: gen-prj
@@ -28,9 +31,13 @@ $(PROJECT_DIR):
 
 syn: | $(PROJECT_DIR)
 	cd $(TCL_DIR) && ./syn.tcl
+	mkdir -p $(OUT_SYN_DIR)
+	rsync -av $(PROJECT_DIR)/npu-axvu13p.runs/ $(OUT_SYN_DIR)/
 
 $(SYN_DIR):
 	$(MAKE) syn
 
 impl: | $(SYN_DIR)
 	cd $(TCL_DIR) && ./impl.tcl
+	mkdir -p $(OUT_IMPL_DIR)
+	rsync -av $(PROJECT_DIR)/npu-axvu13p.runs/impl_1/ $(OUT_IMPL_DIR)/

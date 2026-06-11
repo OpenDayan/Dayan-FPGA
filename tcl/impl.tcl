@@ -14,7 +14,11 @@ set status [get_property STATUS $run_obj]
 set needs_refresh [get_property NEEDS_REFRESH $run_obj]
 
 if { $needs_refresh || ![string match "*Complete*" $status] } {
+    global safe_project_opened_by_script
     puts "synth_1 is not complete or needs refresh"
+    if {$safe_project_opened_by_script} {
+        exit 1
+    }
 } else {
     reset_run impl_1
 

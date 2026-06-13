@@ -309,6 +309,7 @@ proc create_hier_cell_ddr4 { parentCell nameHier } {
   # Create instance: ddr4_0, and set properties
   set ddr4_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:ddr4:2.2 ddr4_0 ]
   set_property -dict [list \
+    CONFIG.C0.DDR4_AxiIDWidth {16} \
     CONFIG.C0.DDR4_InputClockPeriod {5000} \
     CONFIG.C0.DDR4_MemoryPart {MTA16ATF2G64HZ-2G3} \
     CONFIG.C0.DDR4_MemoryType {SODIMMs} \

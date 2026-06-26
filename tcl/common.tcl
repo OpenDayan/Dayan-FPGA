@@ -15,6 +15,7 @@ set soc_bd_wrapper_file "${project_dir}/npu-axvu13p.srcs/sources_1/bd/soc/hdl/so
 set clk_wiz_path "/clk_wiz_0"
 
 source $tcl_dir/config.tcl
+set dut_axi_m_num [llength $dut_axi_m_names]
 
 set top_module "soc_wrapper"
 

@@ -10,10 +10,10 @@ Vivado 版本：2024.2
 ./scripts/update_chiptop.sh $SRC_PATH $TOP_NAME
 ```
 
-`SRC_PATH` 为 Chipyard 生成代码的路径，可为本地路径或远程路径，如
+`SRC_PATH` 为 chisel 生成代码的路径，可为本地路径或远程路径，如
 
-- 本地路径 `/home/test/npu-work/workspace/npu-cluster/generated/ClusterWrapper/`
-- 远程路径 `vef:npu-work/workspace/npu-cluster/generated/ClusterWrapper/`
+- 本地路径 `/home/test/npu-work/workspace/npu-cluster/generated/RvtsocWrapper/`
+- 远程路径 `vef:npu-work/workspace/npu-cluster/generated/RvtsocWrapper/`
 
 ## 配置工程
 

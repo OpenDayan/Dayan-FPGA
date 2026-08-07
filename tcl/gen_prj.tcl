@@ -3,7 +3,24 @@
 set tcl_dir [file dirname [info script]]
 source ${tcl_dir}/common.tcl
 
-set rtl_files   [glob "${root_dir}/src/rtl/*.v" glob "${root_dir}/src/rtl/*.sv"]
+set rtl_dir      "${root_dir}/src/rtl"
+set rtl_filelist "${rtl_dir}/filelist.f"
+set rtl_files    {}
+
+set filelist_fd [open $rtl_filelist r]
+while {[gets $filelist_fd rtl_file] >= 0} {
+    set rtl_file [string trim $rtl_file]
+    if {$rtl_file eq ""} {
+        continue
+    }
+
+    if {[file pathtype $rtl_file] eq "relative"} {
+        set rtl_file [file join $rtl_dir $rtl_file]
+    }
+    lappend rtl_files [file normalize $rtl_file]
+}
+close $filelist_fd
+
 set xdc_files   [list "${root_dir}/src/xdc"]
 # set ip_files    [glob "${root_dir}/src/ip/**/*.xci"]
 

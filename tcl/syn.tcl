@@ -15,8 +15,14 @@ launch_runs synth_1 -jobs $jobs
 
 # Wait for synthesis to complete
 set last_runs []
+set error_runs []
 
 while {1} {
+    set error_runs [get_runs -quiet -filter {STATUS =~ "*ERROR*" && IS_SYNTHESIS}]
+    if {[llength $error_runs] != 0} {
+        break
+    }
+
     set last_runs_new [get_runs -filter {STATUS != "synth_design Complete!" && IS_SYNTHESIS}]
     if {[llength $last_runs_new] == 0} {
         break
@@ -27,6 +33,11 @@ while {1} {
         puts "Waiting: $runs_name"
     }
     after 1000
+}
+
+if {[llength $error_runs] != 0} {
+    set error_runs_name [get_property NAME $error_runs]
+    error "Synthesis failed for run(s): $error_runs_name"
 }
 
 wait_on_run synth_1

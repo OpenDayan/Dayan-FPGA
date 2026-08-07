@@ -30,6 +30,7 @@ current_dir=$(dirname "$(readlink -f "$0")")
 cd "$current_dir" || exit 1
 
 target_dir="$current_dir/../src/rtl/"
+filelist_file="${target_dir}filelist.f"
 
 echo "Current directory: $current_dir"
 echo "Target directory: $target_dir"
@@ -51,6 +52,17 @@ v_file="${target_dir}${top_name}.v"
 if [ -f "$sv_file" ]; then
     echo "Found ${top_name}.sv, renaming to ${top_name}.v ..."
     mv "$sv_file" "$v_file"
+
+    if [ -f "$filelist_file" ]; then
+        if grep -Fq "${top_name}.sv" "$filelist_file"; then
+            echo "Updating ${top_name}.sv to ${top_name}.v in filelist.f ..."
+            sed -i "s/${top_name}\\.sv/${top_name}.v/g" "$filelist_file"
+        else
+            echo "Warning: ${top_name}.sv not found in ${filelist_file}"
+        fi
+    else
+        echo "Warning: filelist.f not found in ${target_dir}"
+    fi
 elif [ -f "$v_file" ]; then
     echo "Found ${top_name}.v already, no rename needed."
 else

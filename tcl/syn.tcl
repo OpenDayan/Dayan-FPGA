@@ -37,6 +37,28 @@ while {1} {
 
 if {[llength $error_runs] != 0} {
     set error_runs_name [get_property NAME $error_runs]
+
+    foreach error_run $error_runs {
+        set error_run_name [get_property NAME $error_run]
+        set error_run_status [get_property STATUS $error_run]
+        set error_run_log [file join [get_property DIRECTORY $error_run] runme.log]
+
+        puts stderr "ERROR: Synthesis run '$error_run_name' failed with status '$error_run_status'."
+        puts stderr "ERROR: Synthesis log: $error_run_log"
+
+        if {[file exists $error_run_log]} {
+            set error_log_fd [open $error_run_log r]
+            while {[gets $error_log_fd error_log_line] >= 0} {
+                if {[string first "ERROR:" $error_log_line] >= 0} {
+                    puts stderr $error_log_line
+                }
+            }
+            close $error_log_fd
+        } else {
+            puts stderr "ERROR: Synthesis log file does not exist."
+        }
+    }
+
     error "Synthesis failed for run(s): $error_runs_name"
 }
 

@@ -1,6 +1,6 @@
 BASE_DIR=$(abspath ./)
 
-CONFIG?=cluster
+CONFIG?=rvtsoc
 
 CONFIG_TCL=tcl/config.tcl
 CONFIGS_DIR=$(BASE_DIR)/tcl/configs

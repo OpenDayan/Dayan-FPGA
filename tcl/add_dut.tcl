@@ -22,7 +22,7 @@ foreach m_name ${dut_axi_m_names} {
 }
 connect_bd_net [get_bd_pins ${dut_mod_name}_0/clock] [get_bd_pins clk_wiz_0/clk_out1]
 connect_bd_net [get_bd_pins ${dut_mod_name}_0/reset] [get_bd_pins proc_sys_reset_0/bus_struct_reset]
-if {[info exists $dut_int_name]} {
+if {[info exists dut_int_name]} {
     connect_bd_net [get_bd_pins ${dut_mod_name}_0/$dut_int_name] [get_bd_pins xdma/usr_irq_req]
 }
 

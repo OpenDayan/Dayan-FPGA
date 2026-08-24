@@ -23,7 +23,7 @@ foreach m_name ${dut_axi_m_names} {
 connect_bd_net [get_bd_pins ${dut_mod_name}_0/clock] [get_bd_pins clk_wiz_0/clk_out1]
 connect_bd_net [get_bd_pins ${dut_mod_name}_0/reset] [get_bd_pins proc_sys_reset_0/bus_struct_reset]
 if {[info exists dut_int_name]} {
-    connect_bd_net [get_bd_pins ${dut_mod_name}_0/$dut_int_name] [get_bd_pins xdma/usr_irq_req]
+    connect_bd_net [get_bd_pins ${dut_mod_name}_0/$dut_int_name] [get_bd_pins qdma/usr_irq_req]
 }
 
 regenerate_bd_layout
@@ -31,12 +31,12 @@ regenerate_bd_layout
 foreach m_name ${dut_axi_m_names} {
     assign_bd_address -target_address_space /${dut_mod_name}_0/${m_name} [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force
 }
-assign_bd_address -target_address_space /xdma/xdma_0/M_AXI [get_bd_addr_segs ${dut_mod_name}_0/s_axi/reg0] -force
+assign_bd_address -target_address_space /qdma/qdma_0/M_AXI [get_bd_addr_segs ${dut_mod_name}_0/s_axi/reg0] -force
 
 
-assign_bd_address -offset ${dut_addr_offset} -range ${dut_addr_range} [get_bd_addr_segs xdma/xdma_0/M_AXI/SEG_${dut_mod_name}_0_reg0]
+assign_bd_address -offset ${dut_addr_offset} -range ${dut_addr_range} [get_bd_addr_segs qdma/qdma_0/M_AXI/SEG_${dut_mod_name}_0_reg0]
 
-assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_addr_segs {xdma/xdma_0/M_AXI/SEG_ddr4_0_C0_DDR4_ADDRESS_BLOCK}]
+assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_addr_segs {qdma/qdma_0/M_AXI/SEG_ddr4_0_C0_DDR4_ADDRESS_BLOCK}]
 assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK]
 
 validate_bd_design -force

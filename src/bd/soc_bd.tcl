@@ -135,7 +135,7 @@ xilinx.com:ip:proc_sys_reset:5.0\
 xilinx.com:ip:ddr4:2.2\
 xilinx.com:ip:util_vector_logic:2.0\
 xilinx.com:ip:util_ds_buf:2.2\
-xilinx.com:ip:xdma:4.1\
+xilinx.com:ip:qdma:5.0\
 "
 
    set list_ips_missing ""
@@ -165,13 +165,13 @@ if { $bCheckIPsPassed != 1 } {
 ##################################################################
 
 
-# Hierarchical cell: xdma
-proc create_hier_cell_xdma { parentCell nameHier } {
+# Hierarchical cell: qdma
+proc create_hier_cell_qdma { parentCell nameHier } {
 
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2092 -severity "ERROR" "create_hier_cell_xdma() - Empty argument(s)!"}
+     catch {common::send_gid_msg -ssname BD::TCL -id 2092 -severity "ERROR" "create_hier_cell_qdma() - Empty argument(s)!"}
      return
   }
 
@@ -219,41 +219,42 @@ proc create_hier_cell_xdma { parentCell nameHier } {
   set_property CONFIG.C_BUF_TYPE {IBUFDSGTE} $util_ds_buf_0
 
 
-  # Create instance: xdma_0, and set properties
-  set xdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xdma:4.1 xdma_0 ]
+  # Create instance: qdma_0, and set properties
+  set qdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:qdma:5.0 qdma_0 ]
   set_property -dict [list \
-    CONFIG.dma_reset_source_sel {User_Reset} \
+    CONFIG.cfg_mgmt_if {true} \
+    CONFIG.dma_intf_sel_qdma {AXI_MM} \
     CONFIG.drp_clk_sel {Internal} \
-    CONFIG.en_gt_selection {true} \
+    CONFIG.dsc_byp_mode {None} \
     CONFIG.mode_selection {Advanced} \
-    CONFIG.pf0_Use_Class_Code_Lookup_Assistant {true} \
-    CONFIG.pf0_msi_enabled {false} \
-    CONFIG.pl_link_cap_max_link_speed {8.0_GT/s} \
-    CONFIG.pl_link_cap_max_link_width {X16} \
-    CONFIG.ref_clk_freq {100_MHz} \
-  ] $xdma_0
+    CONFIG.parity_settings {None} \
+    CONFIG.pcie_extended_tag {true} \
+    CONFIG.pf0_bar2_enabled_qdma {false} \
+    CONFIG.pf0_link_status_slot_clock_config {true} \
+    CONFIG.pipe_sim {false} \
+  ] $qdma_0
 
 
   # Create interface connections
   connect_bd_intf_net -intf_net CLK_IN_D_0_1 [get_bd_intf_pins CLK_IN_D_0] [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
-  connect_bd_intf_net -intf_net xdma_0_M_AXI [get_bd_intf_pins M_AXI] [get_bd_intf_pins xdma_0/M_AXI]
-  connect_bd_intf_net -intf_net xdma_0_pcie_mgt [get_bd_intf_pins pcie_mgt_0] [get_bd_intf_pins xdma_0/pcie_mgt]
+  connect_bd_intf_net -intf_net qdma_0_M_AXI [get_bd_intf_pins M_AXI] [get_bd_intf_pins qdma_0/M_AXI]
+  connect_bd_intf_net -intf_net qdma_0_pcie_mgt [get_bd_intf_pins pcie_mgt_0] [get_bd_intf_pins qdma_0/pcie_mgt]
 
   # Create port connections
   connect_bd_net -net PCIe_rst_n_1  [get_bd_pins PCIe_rst_n] \
-  [get_bd_pins xdma_0/sys_rst_n]
-  connect_bd_net -net usr_irq_req_1  [get_bd_pins usr_irq_req] \
-  [get_bd_pins xdma_0/usr_irq_req]
-  connect_bd_net -net util_ds_buf_0_IBUF_DS_ODIV2  [get_bd_pins util_ds_buf_0/IBUF_DS_ODIV2] \
-  [get_bd_pins xdma_0/sys_clk]
-  connect_bd_net -net util_ds_buf_0_IBUF_OUT  [get_bd_pins util_ds_buf_0/IBUF_OUT] \
-  [get_bd_pins xdma_0/sys_clk_gt]
-  connect_bd_net -net xdma_0_axi_aclk  [get_bd_pins xdma_0/axi_aclk] \
+  [get_bd_pins qdma_0/sys_rst_n]
+  connect_bd_net -net qdma_0_axi_aclk  [get_bd_pins qdma_0/axi_aclk] \
   [get_bd_pins axi_aclk]
-  connect_bd_net -net xdma_0_axi_aresetn  [get_bd_pins xdma_0/axi_aresetn] \
+  connect_bd_net -net qdma_0_axi_aresetn  [get_bd_pins qdma_0/axi_aresetn] \
   [get_bd_pins axi_aresetn]
-  connect_bd_net -net xdma_0_usr_irq_ack  [get_bd_pins xdma_0/usr_irq_ack] \
+  connect_bd_net -net qdma_0_usr_irq_out_ack  [get_bd_pins qdma_0/usr_irq_out_ack] \
   [get_bd_pins usr_irq_ack]
+  connect_bd_net -net usr_irq_req_1  [get_bd_pins usr_irq_req] \
+  [get_bd_pins qdma_0/usr_irq_in_vld]
+  connect_bd_net -net util_ds_buf_0_IBUF_DS_ODIV2  [get_bd_pins util_ds_buf_0/IBUF_DS_ODIV2] \
+  [get_bd_pins qdma_0/sys_clk]
+  connect_bd_net -net util_ds_buf_0_IBUF_OUT  [get_bd_pins util_ds_buf_0/IBUF_OUT] \
+  [get_bd_pins qdma_0/sys_clk_gt]
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -342,11 +343,11 @@ proc create_hier_cell_ddr4 { parentCell nameHier } {
   connect_bd_net -net proc_sys_reset_0_interconnect_aresetn  [get_bd_pins proc_sys_reset_0/interconnect_aresetn] \
   [get_bd_pins ddr4_0/c0_ddr4_aresetn] \
   [get_bd_pins interconnect_aresetn]
-  connect_bd_net -net util_vector_logic_0_Res  [get_bd_pins util_vector_logic_0/Res] \
-  [get_bd_pins ddr4_0/sys_rst]
-  connect_bd_net -net xdma_0_axi_aresetn  [get_bd_pins resetn] \
+  connect_bd_net -net qdma_0_axi_aresetn  [get_bd_pins resetn] \
   [get_bd_pins util_vector_logic_0/Op1] \
   [get_bd_pins proc_sys_reset_0/ext_reset_in]
+  connect_bd_net -net util_vector_logic_0_Res  [get_bd_pins util_vector_logic_0/Res] \
+  [get_bd_pins ddr4_0/sys_rst]
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -414,15 +415,15 @@ proc create_root_design { parentCell } {
   set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_0 ]
   set_property -dict [list \
     CONFIG.NUM_CLKS {3} \
-    CONFIG.NUM_SI {2} \
+    CONFIG.NUM_SI {3} \
   ] $smartconnect_0
 
 
   # Create instance: ddr4
   create_hier_cell_ddr4 [current_bd_instance .] ddr4
 
-  # Create instance: xdma
-  create_hier_cell_xdma [current_bd_instance .] xdma
+  # Create instance: qdma
+  create_hier_cell_qdma [current_bd_instance .] qdma
 
   # Create instance: clk_wiz_0, and set properties
   set clk_wiz_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_0 ]
@@ -443,16 +444,16 @@ proc create_root_design { parentCell } {
 
   # Create interface connections
   connect_bd_intf_net -intf_net C0_SYS_CLK_0_1 [get_bd_intf_ports ddr] [get_bd_intf_pins ddr4/C0_SYS_CLK]
-  connect_bd_intf_net -intf_net CLK_IN_D_0_1 [get_bd_intf_ports PCIe] [get_bd_intf_pins xdma/CLK_IN_D_0]
+  connect_bd_intf_net -intf_net CLK_IN_D_0_1 [get_bd_intf_ports PCIe] [get_bd_intf_pins qdma/CLK_IN_D_0]
   connect_bd_intf_net -intf_net ddr4_0_C0_DDR4 [get_bd_intf_ports c0_ddr4] [get_bd_intf_pins ddr4/C0_DDR4]
+  connect_bd_intf_net -intf_net qdma_0_M_AXI [get_bd_intf_pins qdma/M_AXI] [get_bd_intf_pins smartconnect_1/S00_AXI]
+  connect_bd_intf_net -intf_net qdma_0_pcie_mgt [get_bd_intf_ports pci_exp] [get_bd_intf_pins qdma/pcie_mgt_0]
   connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_pins smartconnect_0/M00_AXI] [get_bd_intf_pins ddr4/C0_DDR4_S_AXI]
   connect_bd_intf_net -intf_net smartconnect_1_M00_AXI [get_bd_intf_pins smartconnect_1/M00_AXI] [get_bd_intf_pins smartconnect_0/S00_AXI]
-  connect_bd_intf_net -intf_net xdma_0_M_AXI [get_bd_intf_pins xdma/M_AXI] [get_bd_intf_pins smartconnect_1/S00_AXI]
-  connect_bd_intf_net -intf_net xdma_0_pcie_mgt [get_bd_intf_ports pci_exp] [get_bd_intf_pins xdma/pcie_mgt_0]
 
   # Create port connections
   connect_bd_net -net PCIe_rst_n_1  [get_bd_ports PCIe_rst_n] \
-  [get_bd_pins xdma/PCIe_rst_n]
+  [get_bd_pins qdma/PCIe_rst_n]
   connect_bd_net -net clk_wiz_0_clk_out1  [get_bd_pins clk_wiz_0/clk_out1] \
   [get_bd_pins proc_sys_reset_0/slowest_sync_clk] \
   [get_bd_pins smartconnect_1/aclk1] \
@@ -464,10 +465,10 @@ proc create_root_design { parentCell } {
   [get_bd_pins clk_wiz_0/clk_in1]
   connect_bd_net -net ddr4_interconnect_aresetn  [get_bd_pins ddr4/interconnect_aresetn] \
   [get_bd_pins proc_sys_reset_0/aux_reset_in]
-  connect_bd_net -net xdma_0_axi_aclk  [get_bd_pins xdma/axi_aclk] \
+  connect_bd_net -net qdma_0_axi_aclk  [get_bd_pins qdma/axi_aclk] \
   [get_bd_pins smartconnect_1/aclk] \
   [get_bd_pins smartconnect_0/aclk1]
-  connect_bd_net -net xdma_0_axi_aresetn  [get_bd_pins xdma/axi_aresetn] \
+  connect_bd_net -net qdma_0_axi_aresetn  [get_bd_pins qdma/axi_aresetn] \
   [get_bd_pins smartconnect_1/aresetn] \
   [get_bd_pins smartconnect_0/aresetn] \
   [get_bd_pins ddr4/resetn] \
@@ -475,7 +476,7 @@ proc create_root_design { parentCell } {
   [get_bd_pins proc_sys_reset_0/ext_reset_in]
 
   # Create address segments
-  assign_bd_address -offset 0x00000000 -range 0x000400000000 -target_address_space [get_bd_addr_spaces xdma/xdma_0/M_AXI] [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force
+  assign_bd_address -offset 0x00000000 -range 0x000400000000 -target_address_space [get_bd_addr_spaces qdma/qdma_0/M_AXI] [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force
 
 
   # Restore current instance

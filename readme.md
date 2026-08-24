@@ -13,22 +13,22 @@
 
 | 模块 | 说明 |
 | --- | --- |
-| `xdma` | Xilinx XDMA IP，PCIe Gen3 x16 主机接口，作为上位机访问 SoC 寄存器和 DDR 的入口 |
+| `qdma` | Xilinx QDMA IP，PCIe Gen3 x16 主机接口，作为上位机访问 SoC 寄存器和 DDR 的入口 |
 | `ddr4` | DDR4 存储控制器（16G，偏移 `0x0000000000`），存放数据 |
-| `smartconnect_0` | 面向 DDR4 的 AXI 互连，汇聚 DUT 主口（`S01_AXI`…）与 xdma 的访问 |
-| `smartconnect_1` | 面向 DUT 寄存器接口的 AXI 互连，xdma 主口经其接入 DUT 的 `s_axi` |
+| `smartconnect_0` | 面向 DDR4 的 AXI 互连，汇聚 DUT 主口（`S01_AXI`…）与 qdma 的访问 |
+| `smartconnect_1` | 面向 DUT 寄存器接口的 AXI 互连，qdma 主口经其接入 DUT 的 `s_axi` |
 | `clk_wiz_0` | 时钟模块，为 DUT 提供输入时钟（默认 50MHz，可脚本修改） |
 | `proc_sys_reset` | 复位控制器，为 DUT 及互连提供复位 |
 
 数据通路如下：
 
-- 上位机经 PCIe（`xdma`）→ `smartconnect_1` → DUT 寄存器接口（`s_axi`），用于配置/控制 DUT。
+- 上位机经 PCIe（`qdma`）→ `smartconnect_1` → DUT 寄存器接口（`s_axi`），用于配置/控制 DUT。
 - DUT 主口（`m_axi`）→ `smartconnect_0` → `ddr4`，用于读写数据。
-- 上位机也可经 `xdma → smartconnect_1 → smartconnect_0 → ddr4` 直接访问 DDR。
+- 上位机也可经 `qdma → smartconnect_1 → smartconnect_0 → ddr4` 直接访问 DDR。
 
 ### DUT slave 口地址映射
 
-`add_dut.tcl` 会将 DUT 的寄存器 slave 口 `s_axi/reg0` 与 DDR4 空间映射到上位机（xdma PCIe）地址空间，主机侧偏移/范围由配置项 `dut_addr_*` 与 `ddr_addr_*` 决定：
+`add_dut.tcl` 会将 DUT 的寄存器 slave 口 `s_axi/reg0` 与 DDR4 空间映射到上位机（qdma PCIe）地址空间，主机侧偏移/范围由配置项 `dut_addr_*` 与 `ddr_addr_*` 决定：
 
 | 目标空间 | 主机侧偏移 | 主机侧范围 |
 | --- | --- | --- |

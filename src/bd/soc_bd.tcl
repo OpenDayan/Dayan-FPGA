@@ -136,6 +136,7 @@ xilinx.com:ip:ddr4:2.2\
 xilinx.com:ip:util_vector_logic:2.0\
 xilinx.com:ip:util_ds_buf:2.2\
 xilinx.com:ip:qdma:5.0\
+xilinx.com:ip:xlconstant:1.1\
 "
 
    set list_ips_missing ""
@@ -235,6 +236,9 @@ proc create_hier_cell_qdma { parentCell nameHier } {
   ] $qdma_0
 
 
+  # Create instance: xlconstant_0, and set properties
+  set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
+
   # Create interface connections
   connect_bd_intf_net -intf_net CLK_IN_D_0_1 [get_bd_intf_pins CLK_IN_D_0] [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
   connect_bd_intf_net -intf_net qdma_0_M_AXI [get_bd_intf_pins M_AXI] [get_bd_intf_pins qdma_0/M_AXI]
@@ -255,6 +259,8 @@ proc create_hier_cell_qdma { parentCell nameHier } {
   [get_bd_pins qdma_0/sys_clk]
   connect_bd_net -net util_ds_buf_0_IBUF_OUT  [get_bd_pins util_ds_buf_0/IBUF_OUT] \
   [get_bd_pins qdma_0/sys_clk_gt]
+  connect_bd_net -net xlconstant_0_dout  [get_bd_pins xlconstant_0/dout] \
+  [get_bd_pins qdma_0/tm_dsc_sts_rdy]
 
   # Restore current instance
   current_bd_instance $oldCurInst

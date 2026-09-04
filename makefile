@@ -30,6 +30,7 @@ $(PROJECT_DIR):
 	$(MAKE) gen-prj
 
 syn: | $(PROJECT_DIR)
+	rm -rf $(OUT_SYN_DIR)
 	cd $(TCL_DIR) && ./syn.tcl
 	mkdir -p $(OUT_SYN_DIR)
 	rsync -av $(PROJECT_DIR)/npu-axvu13p.runs/ $(OUT_SYN_DIR)/
@@ -38,6 +39,7 @@ $(SYN_DIR):
 	$(MAKE) syn
 
 impl: | $(SYN_DIR)
+	rm -rf $(OUT_IMPL_DIR)
 	cd $(TCL_DIR) && ./impl.tcl
 	mkdir -p $(OUT_IMPL_DIR)
 	rsync -av $(PROJECT_DIR)/npu-axvu13p.runs/impl_1/ $(OUT_IMPL_DIR)/

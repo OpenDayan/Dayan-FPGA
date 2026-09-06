@@ -3,14 +3,32 @@ set tcl_dir [file dirname [info script]]
 
 set root_dir "${tcl_dir}/.."
 
+set fpga_ila 0
+if {[info exists ::env(FPGA_ILA)]} {
+    set fpga_ila $::env(FPGA_ILA)
+}
+if {$fpga_ila ni {0 1}} {
+    error "FPGA_ILA must be 0 or 1"
+}
+set fpga_ila_depth 4096
+if {[info exists ::env(FPGA_ILA_DEPTH)]} {
+    set fpga_ila_depth $::env(FPGA_ILA_DEPTH)
+}
+
 set project_name "npu-axvu13p"
+if {$fpga_ila} {
+    append project_name "-ila"
+}
 set project_dir "${root_dir}/${project_name}"
 
 set rpt_dir "${root_dir}/rpt"
+if {$fpga_ila} {
+    append rpt_dir "/ila"
+}
 
 set soc_bd_tcl "${root_dir}/src/bd/soc_bd.tcl"
-set soc_bd_file "${project_dir}/npu-axvu13p.srcs/sources_1/bd/soc/soc.bd"
-set soc_bd_wrapper_file "${project_dir}/npu-axvu13p.srcs/sources_1/bd/soc/hdl/soc_wrapper.v"
+set soc_bd_file "${project_dir}/${project_name}.srcs/sources_1/bd/soc/soc.bd"
+set soc_bd_wrapper_file "${project_dir}/${project_name}.srcs/sources_1/bd/soc/hdl/soc_wrapper.v"
 
 set clk_wiz_path "/clk_wiz_0"
 

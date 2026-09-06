@@ -109,6 +109,53 @@ make impl  # 实现 + 写 bitstream，并生成时序/资源报告
 
 综合日志（`syn.tcl`）会实时检测 run 状态，出错时打印 `runme.log` 中的 ERROR 并终止。
 
+## 可选 System ILA
+
+在 npu-cluster 根目录选择是否启用调试：
+
+```bash
+make verilog-fpga-rts-4c
+make syn-fpga-rts-4c FPGA_ILA=1 FPGA_ILA_DEPTH=4096
+make impl-fpga FPGA_ILA=1
+```
+
+`FPGA_ILA` 本地默认是 `0`，CI 的 `syn-fpga-rts-4c` 和 `impl-fpga-rts-4c` 默认设为 `1`。单核可使用 `syn-fpga-rts`。综合和实现必须使用相同的 `FPGA_ILA` 值；修改采样深度后需要重新生成工程并综合。
+
+| 内容 | `FPGA_ILA=0` | `FPGA_ILA=1` |
+| --- | --- | --- |
+| 工程 | `npu-axvu13p/` | `npu-axvu13p-ila/` |
+| 综合输出 | `out/syn/` | `out/ila/syn/` |
+| 实现输出 | `out/impl/` | `out/ila/impl/` |
+| 报告 | `rpt/` | `rpt/ila/` |
+
+调试脚本独立放在 `debug/`。System ILA 的 IP 和自带时序约束只在带 ILA 的工程中生成，普通 `src/xdc/` 不包含调试约束，也不添加额外跨时钟例外。关闭 ILA 时，Block Design 不连接观察输出，由综合裁剪这些无负载路径。
+
+一个混合模式 System ILA 同时采集以下内容，使用 `ClusterWrapper.clock`，与四个 RTS 核及 uncore 同频同相：
+
+| 观察对象 | 信号与含义 |
+| --- | --- |
+| `SLOT_0_AXI` | 直接连接 DUT 的 `s_axi`，即 frontxbar 外部入口。使用 AXI4 interface monitor，包含 AW/AR 地址、ID、len、burst 等属性，以及 W/R 数据和全部五通道握手，可在 Hardware Manager 中按 AXI 总线查看。 |
+| `ila_coreN_retire_S` | `valid && iretire`，N 为核心编号，S 为 0/1 退休槽。 |
+| `ila_coreN_valid_S`、`ila_coreN_iretire_S` | RTS trace 的原始 valid、iretire。 |
+| `ila_coreN_retire_pc_S`、`ila_coreN_instr_S` | 原始 39 位 `iaddr` 和 48 位 `instr`。仅在对应 retire 有效时解释为退休指令。 |
+| `ila_memoryN_*` | 每个对外内存 AXI 口的 AW/AR 全部非零宽度属性；R/W/B 握手、R/B ID、last 和 response。不采 WDATA、RDATA、WSTRB。AXI4 的 W 通道没有独立 ID，通过 AW/B 的 ID 及突发顺序关联。 |
+| `ila_memoryN_*_fire` | 对应通道的 `valid && ready`。 |
+| `ila_global_cycles` | 64 位全局周期计数器，wrapper 复位时清零，其后每个时钟周期加一，空闲周期也计数。与所有观察信号在同一个 ILA 中采样，可用于计算时间差和吞吐率。 |
+| `ila_global_reset` | wrapper 复位状态。 |
+
+Chisel 从实际接口生成 `generated/<配置>/debug/ila_probes.tcl`，维护原生 probe 顺序、名称和位宽。`debug/add_ila.tcl` 按清单连接同名 RTL 输出，System ILA 自动推导位宽；BD 验证后还会检查连接和位宽，避免带着缺失信号进入综合。实现阶段显式导出 `soc_wrapper.ltx`，与 `soc_wrapper.bit` 一起交给 Hardware Manager。
+
+快速检查不运行综合或实现。在 npu-cluster 根目录执行：
+
+```bash
+source /eda-tools/env/vivado-2024-2
+vivado -mode batch -source fpga/axvu13p/debug/quick_check.tcl -tclargs \
+  generated/ClusterWrapper-FpgaQualRtsClusterConfig/debug/ila_probes.tcl \
+  build/fpga-ila-quick-check
+```
+
+该检查使用生成的 probe 清单创建一个小型 DUT 接口模型，调用正式接线脚本，并在 Vivado 中验证混合模式、AXI 接口和全部命名 probe。通过时输出 `ILA_QUICK_CHECK_PASS`。它不替代完整工程的时序、资源和上板验证。
+
 ## 输出目录
 
 - `rpt/`：`impl.tcl` 生成的时序报告 `timing_summary.rpt` 与资源报告 `utilization.rpt`

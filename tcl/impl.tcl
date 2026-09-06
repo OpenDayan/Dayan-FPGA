@@ -32,6 +32,10 @@ if { $needs_refresh || ![string match "*Complete*" $status] } {
     # Generate reports
     open_run impl_1
 
+    if {$fpga_ila} {
+        source ${root_dir}/debug/write_probes.tcl
+    }
+
     if {![file exists $rpt_dir]} {
         file mkdir $rpt_dir
     }

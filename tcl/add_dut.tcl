@@ -26,6 +26,13 @@ if {[info exists dut_int_name]} {
     connect_bd_net [get_bd_pins ${dut_mod_name}_0/$dut_int_name] [get_bd_pins xdma/usr_irq_req]
 }
 
+if {$fpga_ila} {
+    source ${root_dir}/debug/add_ila.tcl
+    npu_add_cluster_ila ${dut_mod_name}_0 \
+        ${root_dir}/src/rtl/debug/ila_probes.tcl $fpga_ila_depth \
+        [get_bd_pins proc_sys_reset_0/peripheral_aresetn]
+}
+
 regenerate_bd_layout
 
 foreach m_name ${dut_axi_m_names} {
@@ -40,6 +47,9 @@ assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_ad
 assign_bd_address -offset ${ddr_addr_offset} -range ${ddr_addr_range} [get_bd_addr_segs ddr4/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK]
 
 validate_bd_design -force
+if {$fpga_ila} {
+    npu_check_cluster_ila ${root_dir}/src/rtl/debug/ila_probes.tcl
+}
 save_bd_design [current_bd_design]
 
 safe_close_bd_design

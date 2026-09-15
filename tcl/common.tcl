@@ -3,6 +3,14 @@ set tcl_dir [file dirname [info script]]
 
 set root_dir "${tcl_dir}/.."
 
+set fpga_dma xdma
+if {[info exists ::env(FPGA_DMA)]} {
+    set fpga_dma $::env(FPGA_DMA)
+}
+if {$fpga_dma ni {xdma qdma}} {
+    error "FPGA_DMA must be xdma or qdma"
+}
+
 set fpga_ila 0
 if {[info exists ::env(FPGA_ILA)]} {
     set fpga_ila $::env(FPGA_ILA)
@@ -27,6 +35,13 @@ if {$fpga_ila} {
 }
 
 set soc_bd_tcl "${root_dir}/src/bd/soc_bd.tcl"
+if {$fpga_dma eq "qdma"} {
+    set soc_bd_tcl "${root_dir}/src/bd/soc_bd_qdma.tcl"
+}
+set pcie_dma_hier $fpga_dma
+set pcie_dma_cell "${fpga_dma}_0"
+set host_axi_addr_space "/${pcie_dma_hier}/${pcie_dma_cell}/M_AXI"
+
 set soc_bd_file "${project_dir}/${project_name}.srcs/sources_1/bd/soc/soc.bd"
 set soc_bd_wrapper_file "${project_dir}/${project_name}.srcs/sources_1/bd/soc/hdl/soc_wrapper.v"
 

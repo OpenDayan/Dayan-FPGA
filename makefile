@@ -1,9 +1,14 @@
 BASE_DIR=$(abspath ./)
 
 CONFIG?=rvtsoc
+FPGA_DMA ?= xdma
 FPGA_ILA ?= 0
 FPGA_ILA_DEPTH ?= 4096
-export FPGA_ILA FPGA_ILA_DEPTH
+export FPGA_DMA FPGA_ILA FPGA_ILA_DEPTH
+
+ifneq ($(filter $(FPGA_DMA),xdma qdma),$(FPGA_DMA))
+$(error FPGA_DMA must be xdma or qdma)
+endif
 
 ifneq ($(filter $(FPGA_ILA),0 1),$(FPGA_ILA))
 $(error FPGA_ILA must be 0 or 1)

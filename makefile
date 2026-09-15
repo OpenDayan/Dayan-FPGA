@@ -1,10 +1,11 @@
 BASE_DIR=$(abspath ./)
 
 CONFIG?=rvtsoc
+FPGA_FREQ ?= 40
 FPGA_DMA ?= xdma
 FPGA_ILA ?= 0
 FPGA_ILA_DEPTH ?= 4096
-export FPGA_DMA FPGA_ILA FPGA_ILA_DEPTH
+export FPGA_FREQ FPGA_DMA FPGA_ILA FPGA_ILA_DEPTH
 
 ifneq ($(filter $(FPGA_DMA),xdma qdma),$(FPGA_DMA))
 $(error FPGA_DMA must be xdma or qdma)
@@ -13,6 +14,11 @@ endif
 ifneq ($(filter $(FPGA_ILA),0 1),$(FPGA_ILA))
 $(error FPGA_ILA must be 0 or 1)
 endif
+
+$(info FPGA_FREQ = $(FPGA_FREQ))
+$(info FPGA_DMA = $(FPGA_DMA))
+$(info FPGA_ILA = $(FPGA_ILA))
+$(info FPGA_ILA_DEPTH = $(FPGA_ILA_DEPTH))
 
 CONFIG_TCL=tcl/config.tcl
 CONFIGS_DIR=$(BASE_DIR)/tcl/configs

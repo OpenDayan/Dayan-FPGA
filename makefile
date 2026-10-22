@@ -1,7 +1,7 @@
 BASE_DIR=$(abspath ./)
 
 CONFIG?=rvtsoc
-FPGA_FREQ ?= 40
+FPGA_FREQ ?= 50
 FPGA_DMA ?= xdma
 FPGA_ILA ?= 0
 FPGA_ILA_DEPTH ?= 4096
@@ -44,7 +44,7 @@ $(CONFIG_TCL):
 	$(MAKE) config
 
 gen-prj: | $(CONFIG_TCL)
-	cd $(TCL_DIR) && ./gen_prj.tcl
+	cd $(TCL_DIR) && ./gen_prj.tcl && ./set_clk.tcl $(FPGA_FREQ)
 
 $(PROJECT_DIR):
 	$(MAKE) gen-prj

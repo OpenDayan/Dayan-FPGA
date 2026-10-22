@@ -20,20 +20,13 @@ set script_folder [_tcl::get_script_folder]
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2024.2
+set scripts_vivado_version 2025.2
 set current_vivado_version [version -short]
 
 if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
    puts ""
-   if { [string compare $scripts_vivado_version $current_vivado_version] > 0 } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2042 -severity "ERROR" " This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Sourcing the script failed since it was created with a future version of Vivado."}
+   common::send_gid_msg -ssname BD::TCL -id 2040 -severity "CRITICAL WARNING" "This script was generated using Vivado <$scripts_vivado_version> without IP versions in the create_bd_cell commands, but is now being run in <$current_vivado_version> of Vivado. There may have been changes to the IP between Vivado <$scripts_vivado_version> and <$current_vivado_version>, which could impact the functionality and configuration of the design."
 
-   } else {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2041 -severity "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-   }
-
-   return 1
 }
 
 ################################################################
@@ -129,13 +122,13 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:ip:smartconnect:1.0\
-xilinx.com:ip:clk_wiz:6.0\
-xilinx.com:ip:proc_sys_reset:5.0\
-xilinx.com:ip:ddr4:2.2\
-xilinx.com:ip:util_vector_logic:2.0\
-xilinx.com:ip:util_ds_buf:2.2\
-xilinx.com:ip:xdma:4.1\
+xilinx.com:ip:smartconnect:*\
+xilinx.com:ip:clk_wiz:*\
+xilinx.com:ip:proc_sys_reset:*\
+xilinx.com:ip:ddr4:*\
+xilinx.com:ip:util_vector_logic:*\
+xilinx.com:ip:util_ds_buf:*\
+xilinx.com:ip:xdma:*\
 "
 
    set list_ips_missing ""
@@ -215,12 +208,12 @@ proc create_hier_cell_xdma { parentCell nameHier } {
   create_bd_pin -dir I -from 0 -to 0 usr_irq_req
 
   # Create instance: util_ds_buf_0, and set properties
-  set util_ds_buf_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf:2.2 util_ds_buf_0 ]
+  set util_ds_buf_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf util_ds_buf_0 ]
   set_property CONFIG.C_BUF_TYPE {IBUFDSGTE} $util_ds_buf_0
 
 
   # Create instance: xdma_0, and set properties
-  set xdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xdma:4.1 xdma_0 ]
+  set xdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xdma xdma_0 ]
   set_property -dict [list \
     CONFIG.dma_reset_source_sel {User_Reset} \
     CONFIG.drp_clk_sel {Internal} \
@@ -307,7 +300,7 @@ proc create_hier_cell_ddr4 { parentCell nameHier } {
   create_bd_pin -dir O -from 0 -to 0 -type rst interconnect_aresetn
 
   # Create instance: ddr4_0, and set properties
-  set ddr4_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:ddr4:2.2 ddr4_0 ]
+  set ddr4_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:ddr4 ddr4_0 ]
   set_property -dict [list \
     CONFIG.C0.DDR4_AxiIDWidth {16} \
     CONFIG.C0.DDR4_InputClockPeriod {5000} \
@@ -318,10 +311,10 @@ proc create_hier_cell_ddr4 { parentCell nameHier } {
 
 
   # Create instance: proc_sys_reset_0, and set properties
-  set proc_sys_reset_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_0 ]
+  set proc_sys_reset_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset proc_sys_reset_0 ]
 
   # Create instance: util_vector_logic_0, and set properties
-  set util_vector_logic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic:2.0 util_vector_logic_0 ]
+  set util_vector_logic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic util_vector_logic_0 ]
   set_property -dict [list \
     CONFIG.C_OPERATION {not} \
     CONFIG.C_SIZE {1} \
@@ -402,7 +395,7 @@ proc create_root_design { parentCell } {
   set PCIe_rst_n [ create_bd_port -dir I -type rst PCIe_rst_n ]
 
   # Create instance: smartconnect_1, and set properties
-  set smartconnect_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_1 ]
+  set smartconnect_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_1 ]
   set_property -dict [list \
     CONFIG.NUM_CLKS {2} \
     CONFIG.NUM_MI {2} \
@@ -411,7 +404,7 @@ proc create_root_design { parentCell } {
 
 
   # Create instance: smartconnect_0, and set properties
-  set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_0 ]
+  set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_0 ]
   set_property -dict [list \
     CONFIG.NUM_CLKS {3} \
     CONFIG.NUM_SI {2} \
@@ -425,7 +418,7 @@ proc create_root_design { parentCell } {
   create_hier_cell_xdma [current_bd_instance .] xdma
 
   # Create instance: clk_wiz_0, and set properties
-  set clk_wiz_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_0 ]
+  set clk_wiz_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0 ]
   set_property -dict [list \
     CONFIG.CLKOUT1_JITTER {153.164} \
     CONFIG.CLKOUT1_PHASE_ERROR {154.678} \
@@ -439,7 +432,7 @@ proc create_root_design { parentCell } {
 
 
   # Create instance: proc_sys_reset_0, and set properties
-  set proc_sys_reset_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_0 ]
+  set proc_sys_reset_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset proc_sys_reset_0 ]
 
   # Create interface connections
   connect_bd_intf_net -intf_net C0_SYS_CLK_0_1 [get_bd_intf_ports ddr] [get_bd_intf_pins ddr4/C0_SYS_CLK]

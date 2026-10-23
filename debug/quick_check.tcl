@@ -9,10 +9,10 @@ file mkdir $output_dir
 source $schema_file
 
 set axi_fields {
-    {awvalid input 1} {awready output 1} {awaddr input 32} {awid input 4}
+    {awvalid input 1} {awready output 1} {awaddr input 24} {awid input 4}
     {awlen input 8} {awsize input 3} {awburst input 2} {awlock input 1}
     {awcache input 4} {awprot input 3} {awqos input 4} {awregion input 4}
-    {arvalid input 1} {arready output 1} {araddr input 32} {arid input 4}
+    {arvalid input 1} {arready output 1} {araddr input 24} {arid input 4}
     {arlen input 8} {arsize input 3} {arburst input 2} {arlock input 1}
     {arcache input 4} {arprot input 3} {arqos input 4} {arregion input 4}
     {wvalid input 1} {wready output 1} {wdata input 64} {wstrb input 8} {wlast input 1}
@@ -51,7 +51,7 @@ set_property CONFIG.ASSOCIATED_RESET resetn $clock_port
 set_property CONFIG.ASSOCIATED_BUSIF front $clock_port
 connect_bd_net $clock_port [get_bd_pins dut/clock]
 set front [create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 front]
-set_property -dict [list CONFIG.PROTOCOL AXI4 CONFIG.ADDR_WIDTH 32 CONFIG.DATA_WIDTH 64 CONFIG.ID_WIDTH 4 CONFIG.FREQ_HZ 50000000] $front
+set_property -dict [list CONFIG.PROTOCOL AXI4 CONFIG.ADDR_WIDTH 24 CONFIG.DATA_WIDTH 64 CONFIG.ID_WIDTH 4 CONFIG.FREQ_HZ 50000000] $front
 connect_bd_intf_net $front [get_bd_intf_pins dut/s_axi]
 
 source [file join $script_dir add_ila.tcl]
